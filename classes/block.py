@@ -16,7 +16,7 @@ class Block:
         self.validate_hash()
 
     def __str__(self):
-        return f"Bloco #{self.__index}: hash='{self.__hash}' previous_hash='{self.__previous_hash}' nonce='{self.__nonce}' timestamp='{self.__timestamp}' transaction='{self.__transaction.transaction}'"
+        return f"Bloco #{self.__index}: hash='{self.__hash}' previous_hash='{self.__previous_hash}' nonce='{self.__nonce}' timestamp='{self.__timestamp}' transaction='{self.__transaction.get_transaction_type()}'"
 
     def get_hash(self):
         return self.__hash
@@ -31,7 +31,6 @@ class Block:
         input_string = str(self.__index) + self.__timestamp + self.__previous_hash + str(self.__nonce) + str(self.__transaction.to_dict())
 
         return sha256(input_string.encode("utf-8")).hexdigest()
-
 
     def __pow(self, difficulty_target: int):
         # proof of work

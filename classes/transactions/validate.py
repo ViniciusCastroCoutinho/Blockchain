@@ -8,7 +8,7 @@ class Validate(Transaction):
 
     def to_dict(self):
         return {
-            "transaction":self.__transaction,
+            "transaction":self.get_transaction_type(),
             "prescription_id":self.__prescription_id,
             "valid":self.__valid
         }

@@ -11,7 +11,7 @@ class Prescription(Transaction):
 
     def to_dict(self):
         return {
-            "transaction":self.__transaction,
+            "transaction":self.get_transaction_type(),
             "prescription_id":self.__prescription_id,
             "crm":self.__crm,
             "cpf":self.__cpf,
