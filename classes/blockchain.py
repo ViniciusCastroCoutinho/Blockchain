@@ -1,12 +1,13 @@
+from typing import Any
 from .block import Block
 from .transactions.transaction import Transaction
 from .logger import Logger
 
 class BlockChain:
     def __init__(self, difficulty_target=1):
-        self.__blocks = []
-        self.__indexes = {}
-        self.__difficulty_target = difficulty_target
+        self.__blocks:list[Block] = []
+        self.__indexes:dict[Any, list[int]] = {} # not sure whether prescription id should be a simple int or something more complex
+        self.__difficulty_target:int = difficulty_target # number of 0's
 
         self.__genesis_block()
 
@@ -45,6 +46,12 @@ class BlockChain:
 
     def add(self, block:Block):
         """This method does NOT validate if the block/blockchain is valid"""
+        transaction_type = block.get_transaction().get_transaction_type()
+        if transaction_type == "Validate":
+            self.validate_prescription(block)
+        elif transaction_type == "Prescription":
+            self.__add_index(block)
+
         self.__blocks.append(block)
 
     def is_first_block_valid(self):
@@ -96,3 +103,42 @@ class BlockChain:
                 return False
 
         return True
+
+    def __add_index(self, block):
+        prescription_id = block.get_transaction().get_prescription_id()
+        block_index = block.get_index()
+
+        if prescription_id in list(self.__indexes.keys()):
+            self.__indexes[prescription_id].append(block_index)
+        else:
+            self.__indexes[prescription_id] = [block_index]
+
+    def validate_prescription(self, block):
+        prescription_id = block.get_transaction().get_prescription_id()
+
+        prescription_exists = False
+        has_been_validated = False
+        if prescription_id in list(self.__indexes.keys()):
+            for i in self.__indexes[prescription_id]:
+                if self.__blocks[i].get_transaction().get_transaction_type() == "Prescription":
+                    prescription_exists = True
+
+                    for j in self.__indexes[prescription_id][i:]:
+                        transaction = self.__blocks[j].get_transaction()
+
+                        if transaction.get_transaction_type() == "Validate" and transaction.get_validation() == True:
+                            has_been_validated = transaction.get_validation()
+                            break
+                    break
+
+        if prescription_exists and not has_been_validated:
+            Logger.info("Prescription exists and hasn't been validated")
+            block.get_transaction().set_validation(True)
+        elif prescription_exists and has_been_validated:
+            Logger.info("Prescription exists but has been validated")
+            block.get_transaction().set_validation(False)
+        else:
+            Logger.info("Prescription doesn't exist")
+            block.get_transaction().set_validation(False)
+
+        self.__add_index(block)

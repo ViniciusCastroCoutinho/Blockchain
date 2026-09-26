@@ -1,5 +1,5 @@
 import datetime
-from .transactions.transaction import Transaction
+from .transactions import Transaction, Validate, Prescription
 from .logger import Logger
 from hashlib import sha256
 
@@ -26,6 +26,9 @@ class Block:
 
     def get_previous_hash(self):
         return self.__previous_hash
+
+    def get_transaction(self) -> Transaction|Validate|Prescription:
+        return self.__transaction
 
     def calculate_hash(self):
         input_string = str(self.__index) + self.__timestamp + self.__previous_hash + str(self.__nonce) + str(self.__transaction.to_dict())
