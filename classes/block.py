@@ -35,6 +35,11 @@ class Block:
 
         return sha256(input_string.encode("utf-8")).hexdigest()
 
+    def update_hash(self, difficulty_target: int):
+        """Updates hash should there be a change in this blocks' transaction"""
+        self.__hash = self.calculate_hash()
+        self.__pow(difficulty_target)
+
     def __pow(self, difficulty_target: int):
         # proof of work
         while self.__hash[:difficulty_target].count("0") != difficulty_target:
@@ -43,6 +48,6 @@ class Block:
 
     def validate_hash(self):
         if not self.calculate_hash() == self.__hash:
-            Logger.error(f"Hash calculado '{self.calculate_hash()}' não foi igual ao hash armazenado no bloco '{self.__hash}'")
+            Logger.error(f"Calculated block's hash '{self.calculate_hash()}' was not equal to block's stored hash '{self.__hash}'")
             return False
         return True

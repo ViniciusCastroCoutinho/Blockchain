@@ -1,4 +1,5 @@
 class Transaction:
+    """Base Transaction class. Not really used for anything"""
     def __init__(self, transaction_type):
         self.__transaction = transaction_type
 

@@ -52,6 +52,7 @@ class BlockChain:
         elif transaction_type == "Prescription":
             self.__add_index(block)
 
+        self.is_block_valid(block, self.__blocks[-1])
         self.__blocks.append(block)
 
     def is_first_block_valid(self):
@@ -69,16 +70,18 @@ class BlockChain:
             Logger.error('Genesis block did not have valid hash')
             return False
 
+        Logger.valid(f"Genesis block is valid")
         return True
 
-    # TODO error messages
     @staticmethod
     def is_block_valid(block:Block, previous_block:Block):
         """DON'T use this to check genesis block"""
         if block.get_previous_hash() == "":
+            Logger.error("Block has no previous hash")
             return False
 
         if block.get_previous_hash() != previous_block.get_hash():
+            Logger.error("Block's previous hash does not match previous block's hash")
             return False
 
         if block.get_index() != previous_block.get_index() + 1:
@@ -88,9 +91,9 @@ class BlockChain:
         if not block.validate_hash():
             return False
 
+        Logger.valid(f"Block {block.get_index()} is valid")
         return True
 
-    # TODO messages
     def is_blockchain_valid(self):
         if not self.is_first_block_valid():
             return False
@@ -100,8 +103,10 @@ class BlockChain:
             previous_block = self.__blocks[i-1]
 
             if not self.is_block_valid(block, previous_block):
+                Logger.invalid("Block chain is invalid")
                 return False
 
+        Logger.valid("Block chain is valid")
         return True
 
     def __add_index(self, block):
@@ -133,12 +138,13 @@ class BlockChain:
 
         if prescription_exists and not has_been_validated:
             Logger.info("Prescription exists and hasn't been validated")
+            Logger.valid("Prescription validated")
             block.get_transaction().set_validation(True)
+            block.update_hash(self.__difficulty_target)
         elif prescription_exists and has_been_validated:
-            Logger.info("Prescription exists but has been validated")
-            block.get_transaction().set_validation(False)
+            Logger.info("Prescription exists but has already been validated")
+            Logger.invalid("This prescription can no longer be validated")
         else:
-            Logger.info("Prescription doesn't exist")
-            block.get_transaction().set_validation(False)
+            Logger.invalid("Prescription doesn't exist")
 
         self.__add_index(block)
