@@ -4,29 +4,34 @@ from .logger import Logger
 
 class BlockChain:
     def __init__(self, difficulty_target=1):
-        self.blocks = []
-        self.indexes = {}
-        self.difficulty_target = difficulty_target
+        self.__blocks = []
+        self.__indexes = {}
+        self.__difficulty_target = difficulty_target
 
         self.__genesis_block()
 
     def __str__(self):
         output = ""
-        for block in self.blocks:
+        for block in self.__blocks:
             output += "\n" + block.__str__()
         return output
 
+    def get_blocks(self):
+        return self.__blocks
+
+    def get_indexes(self):
+        return self.__indexes
 
     def __genesis_block(self):
         genesis_transaction = Transaction("genesis_block")
-        genesis_block = Block(0, "", self.difficulty_target, genesis_transaction)
+        genesis_block = Block(0, "", self.__difficulty_target, genesis_transaction)
 
-        self.blocks.append(genesis_block)
+        self.__blocks.append(genesis_block)
 
         assert self.is_first_block_valid(), "Failed to create genesis block"
 
     def get_last_block_hash(self):
-        return self.blocks[-1].hash
+        return self.__blocks[-1].get_hash()
 
     def create_block(self, transaction:Transaction):
         """
@@ -34,23 +39,22 @@ class BlockChain:
         index, and uses blockchain's difficulty target. You can still create (risky) blocks by using Block class
         constructor.
         """
-        index = len(self.blocks)
+        index = len(self.__blocks)
         previous_hash = self.get_last_block_hash()
-        return Block(index, previous_hash, self.difficulty_target, transaction)
+        return Block(index, previous_hash, self.__difficulty_target, transaction)
 
     def add(self, block:Block):
         """This method does NOT validate if the block/blockchain is valid"""
-        self.blocks.append(block)
+        self.__blocks.append(block)
 
-    # TODO error messages
     def is_first_block_valid(self):
-        first_block = self.blocks[0]
+        first_block = self.__blocks[0]
 
-        if first_block.index != 0:
+        if first_block.get_index() != 0:
             Logger.error("Genesis block did not have 0 as index")
             return False
 
-        if first_block.previous_hash != "":
+        if first_block.get_previous_hash() != "":
             Logger.error('Genesis block did not have "" as previous hash')
             return False
 
@@ -64,13 +68,13 @@ class BlockChain:
     @staticmethod
     def is_block_valid(block:Block, previous_block:Block):
         """DON'T use this to check genesis block"""
-        if block.previous_hash == "":
+        if block.get_previous_hash() == "":
             return False
 
-        if block.previous_hash != previous_block.hash:
+        if block.get_previous_hash() != previous_block.get_hash():
             return False
 
-        if block.index != previous_block.index + 1:
+        if block.get_index() != previous_block.get_index() + 1:
             Logger.error("Block index is not previous block index + 1")
             return False
 
@@ -84,9 +88,9 @@ class BlockChain:
         if not self.is_first_block_valid():
             return False
 
-        for i in range(1, len(self.blocks)):
-            block = self.blocks[i]
-            previous_block = self.blocks[i-1]
+        for i in range(1, len(self.__blocks)):
+            block = self.__blocks[i]
+            previous_block = self.__blocks[i-1]
 
             if not self.is_block_valid(block, previous_block):
                 return False
