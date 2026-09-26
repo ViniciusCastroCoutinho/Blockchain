@@ -1,5 +1,7 @@
 from classes import BlockChain, Block
 from classes.transactions import Prescription, Validate, Transaction
+import google_drive
+import pdf
 
 
 def assure_answer(start_num, end_num):
@@ -131,10 +133,13 @@ def write_prescription(crm):
     cpf = input()
 
     print("Write your prescription")
-    prescription = input()
-    # pdf_link = generate_pdf(crm, cpf, prescription) # TODO
+    prescription_body = input()
 
-    prescription = Prescription(auto_prescription_id, crm, cpf)
+    filepath = pdf.write_prescription(auto_prescription_id, crm, cpf, prescription_body)
+
+    pdf_link = google_drive.upload(filepath)
+
+    prescription = Prescription(auto_prescription_id, crm, cpf, pdf_link)
     auto_prescription_id += 1
 
     blockchain.add(blockchain.create_block(prescription))
