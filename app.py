@@ -61,11 +61,6 @@ registry: Registry = st.session_state.registry
 contract: PrescriptionContract = st.session_state.contract
 
 st.title("💊 Blockchain de Prescrições")
-st.caption(
-    "Interface web para o sistema que antes só rodava pelo terminal (cli.py). "
-    "Toda emissão/validação passa primeiro pelo smart contract (classes/contract.py): "
-    "se CRM, CPF ou CNPJ não forem válidos e cadastrados, nenhum bloco é minerado."
-)
 
 tab_medico, tab_farmacia, tab_blockchain, tab_cadastro = st.tabs(
     ["🩺 Médico", "🏪 Farmácia", "⛓️ Blockchain (admin/teste)", "🗂️ Cadastro (Admin)"]
