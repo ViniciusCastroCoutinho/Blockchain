@@ -127,11 +127,14 @@ class BlockChain:
         prescription_exists = False
         has_been_validated = False
         if prescription_id in list(self.__indexes.keys()):
-            for i in self.__indexes[prescription_id]:
+            related = self.__indexes[prescription_id]
+            for position, i in enumerate(related):
                 if self.__blocks[i].get_transaction().get_transaction_type() == "Prescription":
                     prescription_exists = True
 
-                    for j in self.__indexes[prescription_id][i:]:
+                    # fatia pela POSIÇÃO na lista (antes usava o nº do bloco `i`,
+                    # o que pulava validações anteriores e permitia validar 2x)
+                    for j in related[position:]:
                         transaction = self.__blocks[j].get_transaction()
 
                         if transaction.get_transaction_type() == "Validate" and transaction.get_validation() == True:
