@@ -1,5 +1,8 @@
-from Blockchain.classes import BlockChain, Block
+import os
+
+from Blockchain.classes import BlockChain, Block, Registry, PrescriptionContract, ContractViolation
 from Blockchain.classes.transactions import Prescription, Validate, Transaction
+from Blockchain.classes.documents import normalize_crm, normalize_cpf
 import Blockchain.google_drive as google_drive
 import Blockchain.pdf as pdf
 
@@ -135,6 +138,12 @@ def write_prescription(crm):
     print("Write your prescription")
     prescription_body = input()
 
+    # smart contract: recusa ANTES de gerar PDF/minerar
+    if not contract.authorize_prescription(crm, cpf, prescription_body):
+        print(f"[CONTRACT] Rejected: {contract.last_reason()}. No block was mined.\n")
+        return
+    crm, cpf = normalize_crm(crm), normalize_cpf(cpf)
+
     filepath = pdf.write_prescription(auto_prescription_id, crm, cpf, prescription_body)
 
     pdf_link = google_drive.upload(filepath)
@@ -142,17 +151,24 @@ def write_prescription(crm):
     prescription = Prescription(auto_prescription_id, crm, cpf, pdf_link)
     auto_prescription_id += 1
 
-    blockchain.add(blockchain.create_block(prescription))
+    block = blockchain.create_block(prescription)
+    blockchain.add(block)
+    contract.record_receipt(block)
 
 def validate_prescription(cnpj):
     print("What is the id of the prescription to be validated?")
     prescription_id = int(input())  # NOTE change this if prescription_id type changes
 
-    transaction = Validate(prescription_id, cnpj)
-    blockchain.add(blockchain.create_block(transaction))
+    try:
+        contract.submit_validation(blockchain, prescription_id, cnpj)
+    except ContractViolation as e:
+        print(f"[CONTRACT] Rejected: {e.reason}. No block was mined.\n")
 
 if __name__ == "__main__":
     auto_prescription_id = 0
     blockchain = BlockChain()
+    # mesmo arquivo de cadastro usado pela aba "Cadastro (Admin)" do app.py
+    registry = Registry(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "registry.json"))
+    contract = PrescriptionContract(registry)
 
     doctor_or_drugstore()

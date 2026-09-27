@@ -1,0 +1,38 @@
+{
+  "medicos": {
+    "67890AM": {
+      "nome": "Dr. Carlos Lima",
+      "crm": "67890AM",
+      "cadastrado_em": "2026-09-26 23:33:47"
+    },
+    "12345AM": {
+      "nome": "Marcelo Schettini",
+      "crm": "12345AM",
+      "cadastrado_em": "2026-09-26 23:35:27"
+    }
+  },
+  "pacientes": {
+    "52998224725": {
+      "nome": "João Pereira",
+      "cpf": "52998224725",
+      "cadastrado_em": "2026-09-26 23:33:47"
+    },
+    "12345678909": {
+      "nome": "Maria Oliveira",
+      "cpf": "12345678909",
+      "cadastrado_em": "2026-09-26 23:33:47"
+    }
+  },
+  "farmacias": {
+    "11222333000181": {
+      "nome": "Farmácia Central",
+      "cnpj": "11222333000181",
+      "cadastrado_em": "2026-09-26 23:33:47"
+    },
+    "12345678000195": {
+      "nome": "Drogaria Manaus",
+      "cnpj": "12345678000195",
+      "cadastrado_em": "2026-09-26 23:33:47"
+    }
+  }
+}
