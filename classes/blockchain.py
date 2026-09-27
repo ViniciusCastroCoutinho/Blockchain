@@ -23,6 +23,9 @@ class BlockChain:
     def get_indexes(self):
         return self.__indexes
 
+    def get_difficulty_target(self):
+        return self.__difficulty_target
+
     def __genesis_block(self):
         genesis_transaction = Transaction("genesis_block")
         genesis_block = Block(0, "", self.__difficulty_target, genesis_transaction)

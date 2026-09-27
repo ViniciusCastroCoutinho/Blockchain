@@ -24,6 +24,12 @@ class Block:
     def get_index(self):
         return self.__index
 
+    def get_timestamp(self):
+        return self.__timestamp
+
+    def get_nonce(self):
+        return self.__nonce
+
     def get_previous_hash(self):
         return self.__previous_hash
 

@@ -1,7 +1,7 @@
-from classes import BlockChain, Block
-from classes.transactions import Prescription, Validate, Transaction
-import google_drive
-import pdf
+from Blockchain.classes import BlockChain, Block
+from Blockchain.classes.transactions import Prescription, Validate, Transaction
+import Blockchain.google_drive as google_drive
+import Blockchain.pdf as pdf
 
 
 def assure_answer(start_num, end_num):

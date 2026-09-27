@@ -2,8 +2,8 @@ from reportlab.pdfgen import canvas
 import os
 import qrcode
 
-def write_prescription(prescription_id, crm, cpf, prescription_body):
-    filename = f'receita_{prescription_id}.pdf'
+def write_prescription(prescription_id, crm, cpf, prescription_body, output_dir="."):
+    filename = os.path.join(output_dir, f'receita_{prescription_id}.pdf')
     document_title = title = 'Receita'
 
     body = [
@@ -28,16 +28,16 @@ def write_prescription(prescription_id, crm, cpf, prescription_body):
 
     pdf.drawText(text)
 
+    qr_path = os.path.join(output_dir, f'qrcode_{prescription_id}.png')
     img = qrcode.make(f'{prescription_id}')
-    img.save('qrcode.png')
+    img.save(qr_path)
 
     width = height = 250
-    pdf.drawImage('qrcode.png', 10, 10, 10 + width, 10 + height, mask=[1, 254, 1, 254, 1, 254])
+    pdf.drawImage(qr_path, 10, 10, 10 + width, 10 + height, mask=[1, 254, 1, 254, 1, 254])
     pdf.showPage()
 
-    os.remove("qrcode.png")
+    os.remove(qr_path)
 
     pdf.save()
 
     return filename
-
